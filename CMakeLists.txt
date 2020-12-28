@@ -18,6 +18,7 @@ include("cmake/HunterGate.cmake")
 HunterGate(
   URL "https://github.com/cpp-pm/hunter/archive/v0.23.278.tar.gz"
   SHA1 "35fa55bc1dfcf9f4d7264f8bb26cd1759ce1ae07"
+  FILEPATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.cmake
 )
 
 # TODO: rename project and delete this comment
@@ -25,6 +26,15 @@ project(template VERSION 0.1.0)
 string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
 string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
 string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
+
+hunter_add_package(gflags)
+find_package(gflags CONFIG REQUIRED)
+
+hunter_add_package(rocksdb)
+find_package(RocksDB CONFIG REQUIRED)
+
+hunter_add_package(Boost COMPONENTS program_options)
+find_package(Boost CONFIG REQUIRED program_options)
 
 hunter_add_package(GTest)
 find_package(GTest CONFIG REQUIRED)
