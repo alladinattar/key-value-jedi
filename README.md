@@ -27,6 +27,10 @@
 ```
 и заполняет новое хранилище контрольной суммой для каждой записи
 
+```Shell
+$ dbcs source.db --output dbcs-source.db
+```
+
 ```md
 # db-cat dbcs-source.db
 
