@@ -52,8 +52,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include>"
 )
+target_link_libraries(demo ${PROJECT_NAME} )
+target_link_libraries( ${PROJECT_NAME} RocksDB::rocksdb
+        ${Boost_PROGRAM_OPTIONS_LIBRARY}
 
-target_link_libraries(demo ${PROJECT_NAME})
+        ${Boost_LOG_SETUP_LIBRARY}
+        ${Boost_LOG_LIBRARY}
+        ${Boost_FILESYSTEM_LIBRARY}
+        )
 
 if(BUILD_TESTS)
   add_executable(tests
