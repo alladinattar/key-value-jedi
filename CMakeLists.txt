@@ -43,6 +43,8 @@ add_library(${PROJECT_NAME} STATIC
   # enum your files and delete this comment
         include/dbWrapper.hpp
         sources/dbWrapper.cpp
+        include/hashData.hpp
+        sources/hashData.cpp
 )
 
 add_executable(demo
@@ -52,7 +54,9 @@ add_executable(demo
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:include>"
-)
+        "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/third-party/PicoSHA2>"
+
+        )
 target_link_libraries(demo ${PROJECT_NAME} )
 target_link_libraries( ${PROJECT_NAME} RocksDB::rocksdb
         ${Boost_PROGRAM_OPTIONS_LIBRARY}

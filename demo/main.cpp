@@ -1,6 +1,7 @@
 #include <boost/program_options.hpp>
 #include <dbWrapper.hpp>
 
+#include "hashData.hpp"
 #include "iostream"
 namespace po = boost::program_options;
 
@@ -25,10 +26,11 @@ int main(int argc, char* argv[]) {
   rocksdbWrapper db = rocksdbWrapper(10, "/home/rinat/labs/databasa");
   db.loadNewDB();
   std::map<std::string, std::string> kvStorage;
-  db.getValues(kvStorage);
+  db.migrateDataToMap(kvStorage);
   /*for (std::map<std::string,std::string>::iterator it=kvStorage.begin(); it!=kvStorage.end(); ++it)
     std::cout << it->first << " => " << it->second << '\n';*/
-
+  hashData hasher = hashData(kvStorage);
+  hasher.hashStorage();
 
   if (vm.count("help")) {
     std::cout << desc << "\n";
