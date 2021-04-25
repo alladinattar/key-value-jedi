@@ -25,12 +25,13 @@ int main(int argc, char* argv[]) {
 
   rocksdbWrapper db = rocksdbWrapper(10, "/home/rinat/labs/databasa");
   db.loadNewDB();
-  std::map<std::string, std::string> kvStorage;
-  db.migrateDataToMap(kvStorage);
+  db.openWithFamilies();
+  //std::map<std::string, std::string> kvStorage;
+  //db.migrateDataToMap(kvStorage);
   /*for (std::map<std::string,std::string>::iterator it=kvStorage.begin(); it!=kvStorage.end(); ++it)
     std::cout << it->first << " => " << it->second << '\n';*/
-  hashData hasher = hashData(kvStorage);
-  hasher.hashStorage();
+  //hashData hasher = hashData(kvStorage);
+  //hasher.hashStorage();
 
   if (vm.count("help")) {
     std::cout << desc << "\n";

@@ -17,8 +17,9 @@ class rocksdbWrapper{
  public:
   rocksdbWrapper(int dbSize, std::string path): dbSize_(dbSize), path_(std::move(path)){}
   void loadNewDB();
+  void openWithFamilies();
   void migrateDataToMap(std::map<std::string,std::string>& kvStorage);
-  ~rocksdbWrapper(){delete db_;}
+  ~rocksdbWrapper(){}
 };
 
 
