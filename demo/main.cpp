@@ -23,16 +23,19 @@ int main(/*int argc, char* argv[]*/) {
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);*/
 
-  rocksdbWrapper db = rocksdbWrapper(10, 10, "/tmp/database");
-  db.createDatabase();
+  rocksdbWrapper db = rocksdbWrapper(10,10, "/tmp/database");
+  //db.createDatabase();
   db.getFamiliesFromBD();
-  db.pushData();
+  //db.pushData();
   std::map<std::string, std::map<std::string, std::string>> mapa;
   db.migrateDataToMap(mapa);
-  for (auto const& x : mapa) {
+  rocksMapHasher hasher = rocksMapHasher(mapa);
+  std::map<std::string, std::map<std::string, std::string>> hashedMap = hasher.hashStorage();
+
+  for (auto const& x : hashedMap) {
     std::cout << x.first << std::endl;
     for (auto const& y : x.second) {
-      std::cout<<"  " << y.first << ": " << y.second;
+      std::cout<<"  " << y.first << ": " << y.second<<std::endl;
     }
     std::cout<<std::endl;
   }

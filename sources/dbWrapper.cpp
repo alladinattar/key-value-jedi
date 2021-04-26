@@ -4,9 +4,7 @@
 
 #include "iostream"
 
-
-
-void rocksdbWrapper::getFamiliesFromBD(){
+void rocksdbWrapper::getFamiliesFromBD() {
   rocksdb::Options options;
   rocksdb::Status status = rocksdb::DB::OpenForReadOnly(options, path_, &db_);
   if (!status.ok()) std::cerr << status.ToString() << std::endl;
@@ -78,17 +76,17 @@ void rocksdbWrapper::migrateDataToMap(
   column_families.push_back(rocksdb::ColumnFamilyDescriptor(
       rocksdb::kDefaultColumnFamilyName, rocksdb::ColumnFamilyOptions()));
   std::vector<rocksdb::ColumnFamilyHandle*> handles;
-  rocksdb::Status status = rocksdb::DB::OpenForReadOnly(rocksdb::DBOptions(), path_,
-                                                        column_families, &handles, &db_);
+  rocksdb::Status status = rocksdb::DB::OpenForReadOnly(
+      rocksdb::DBOptions(), path_, column_families, &handles, &db_);
 
   rocksdb::Iterator* it = db_->NewIterator(rocksdb::ReadOptions());
   std::map<std::string, std::string> kvStorage;
-  for(it->SeekToFirst(); it->Valid(); it->Next()){
+  for (it->SeekToFirst(); it->Valid(); it->Next()) {
     kvStorage[it->key().ToString()] = it->value().ToString();
   }
   kvfStorage["default"] = kvStorage;
   kvStorage.clear();
-  assert(it->status().ok());// Check for any errors found during the scan
+  assert(it->status().ok());  // Check for any errors found during the scan
 
   for (auto handle : handles) {
     status = db_->DestroyColumnFamilyHandle(handle);
@@ -104,24 +102,22 @@ void rocksdbWrapper::migrateDataToMap(
         family, rocksdb::ColumnFamilyOptions()));
 
     status = rocksdb::DB::OpenForReadOnly(rocksdb::DBOptions(), path_,
-                                                          column_families, &handles, &db_);
+                                          column_families, &handles, &db_);
     assert(status.ok());
 
     it = db_->NewIterator(rocksdb::ReadOptions());
-    for(it->SeekToFirst(); it->Valid(); it->Next()){
+    for (it->SeekToFirst(); it->Valid(); it->Next()) {
       kvStorage[it->key().ToString()] = it->value().ToString();
     }
     kvfStorage[family] = kvStorage;
     kvStorage.clear();
-    assert(it->status().ok());// Check for any errors found during the scan
+    assert(it->status().ok());  // Check for any errors found during the scan
 
     for (auto handle : handles) {
       status = db_->DestroyColumnFamilyHandle(handle);
       assert(status.ok());
     }
-
   }
   delete it;
   delete db_;
-
 }

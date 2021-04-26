@@ -3,13 +3,13 @@
 #include "picosha2.h"
 #include "iostream"
 #include "utility"
-class hashData {
+#include "map"
+class rocksMapHasher{
  private:
-  std::map<std::string, std::string> storage_;
-  std::map<std::string, std::string> hashStorage_;
-
+  std::map<std::string, std::map<std::string,std::string>> rocksMap_;
+  std::map<std::string, std::map<std::string,std::string>> hashedMap_;
  public:
-  hashData(std::map<std::string, std::string>& kvStorage)
-      : storage_(kvStorage) {}
-  void hashStorage();
+ rocksMapHasher(std::map<std::string, std::map<std::string,std::string>>& rocksMap)
+      : rocksMap_(rocksMap) {}
+  std::map<std::string, std::map<std::string,std::string>> hashStorage();
 };

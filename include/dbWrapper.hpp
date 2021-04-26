@@ -24,7 +24,6 @@ class rocksdbWrapper {
   void createDatabase();
   void getFamiliesFromBD();
   void pushData();
-  void pullData();
   void migrateDataToMap(
       std::map<std::string, std::map<std::string, std::string>>&);
   ~rocksdbWrapper() {}
