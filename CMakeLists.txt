@@ -33,8 +33,8 @@ find_package(gflags CONFIG REQUIRED)
 hunter_add_package(rocksdb)
 find_package(RocksDB CONFIG REQUIRED)
 
-hunter_add_package(Boost COMPONENTS program_options)
-find_package(Boost CONFIG REQUIRED program_options)
+hunter_add_package(Boost COMPONENTS program_options thread log )
+find_package(Boost CONFIG REQUIRED program_options thread log log_setup)
 
 hunter_add_package(GTest)
 find_package(GTest CONFIG REQUIRED)
@@ -45,6 +45,7 @@ add_library(${PROJECT_NAME} STATIC
         sources/dbWrapper.cpp
         include/hashData.hpp
         sources/hashData.cpp
+        include/ThreadPool.h
 )
 
 add_executable(demo
@@ -61,6 +62,7 @@ target_link_libraries(demo ${PROJECT_NAME} )
 target_link_libraries( ${PROJECT_NAME} RocksDB::rocksdb
         ${Boost_PROGRAM_OPTIONS_LIBRARY}
 
+        ${Boost_THREAD_LIBRARY}
         ${Boost_LOG_SETUP_LIBRARY}
         ${Boost_LOG_LIBRARY}
         ${Boost_FILESYSTEM_LIBRARY}
