@@ -5,8 +5,8 @@
 #include "iostream"
 namespace po = boost::program_options;
 
-int main(int argc, char* argv[]) {
-  po::options_description desc(
+int main(/*int argc, char* argv[]*/) {
+  /*po::options_description desc(
       "Usage:\n  dbcs [options] <path/to/input/storage.db>\nMust have options");
   desc.add_options()("help", "produce help message")(
       "log-level", po::value<std::string>(),
@@ -21,20 +21,23 @@ int main(int argc, char* argv[]) {
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
-  po::notify(vm);
+  po::notify(vm);*/
 
-  rocksdbWrapper db = rocksdbWrapper(10, "/home/rinat/labs/databasa");
-  db.loadNewDB();
-  db.openWithFamilies();
-  //std::map<std::string, std::string> kvStorage;
-  //db.migrateDataToMap(kvStorage);
-  /*for (std::map<std::string,std::string>::iterator it=kvStorage.begin(); it!=kvStorage.end(); ++it)
-    std::cout << it->first << " => " << it->second << '\n';*/
-  //hashData hasher = hashData(kvStorage);
-  //hasher.hashStorage();
-
-  if (vm.count("help")) {
+  rocksdbWrapper db = rocksdbWrapper(10, 10, "/tmp/database");
+  db.createDatabase();
+  db.getFamiliesFromBD();
+  db.pushData();
+  std::map<std::string, std::map<std::string, std::string>> mapa;
+  db.migrateDataToMap(mapa);
+  for (auto const& x : mapa) {
+    std::cout << x.first << std::endl;
+    for (auto const& y : x.second) {
+      std::cout<<"  " << y.first << ": " << y.second;
+    }
+    std::cout<<std::endl;
+  }
+  /*if (vm.count("help")) {
     std::cout << desc << "\n";
     return 1;
-  }
+  }*/
 }

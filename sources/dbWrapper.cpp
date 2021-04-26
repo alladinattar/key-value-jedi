@@ -1,75 +1,127 @@
 // Copyright 2020 Your Name <your_email>
 
 #include "dbWrapper.hpp"
+
 #include "iostream"
 
 
 
-void rocksdbWrapper::openWithFamilies() {
+void rocksdbWrapper::getFamiliesFromBD(){
+  rocksdb::Options options;
+  rocksdb::Status status = rocksdb::DB::OpenForReadOnly(options, path_, &db_);
+  if (!status.ok()) std::cerr << status.ToString() << std::endl;
+  db_->ListColumnFamilies(options, path_, &families_);
+  delete db_;
+}
+void rocksdbWrapper::createDatabase() {
   rocksdb::Options options;
   options.create_if_missing = true;
-  rocksdb::DB* db;
+
+  rocksdb::Status status = rocksdb::DB::Open(options, path_, &db_);
+  if (!status.ok()) std::cerr << status.ToString() << std::endl;
+
+  for (int i = 0; i < familyNum_; ++i) {
+    rocksdb::ColumnFamilyHandle* cf;
+    status = db_->CreateColumnFamily(rocksdb::ColumnFamilyOptions(),
+                                     "family_" + std::to_string(i), &cf);
+    assert(status.ok());
+    db_->DestroyColumnFamilyHandle(cf);
+  }
+
+  delete db_;
+}
+
+int rocksdbWrapper::getFamilyNum() { return families_.size(); }
+
+void rocksdbWrapper::pushData() {
+  rocksdb::Options options;
 
   std::vector<rocksdb::ColumnFamilyDescriptor> column_families;
   // have to open default column family
-  /*column_families.push_back(rocksdb::ColumnFamilyDescriptor(
+  column_families.push_back(rocksdb::ColumnFamilyDescriptor(
       rocksdb::kDefaultColumnFamilyName, rocksdb::ColumnFamilyOptions()));
-  // open the new one, too
-  column_families.push_back(rocksdb::ColumnFamilyDescriptor(
-      "family_1", rocksdb::ColumnFamilyOptions()));
-  column_families.push_back(rocksdb::ColumnFamilyDescriptor(
-      "family_2", rocksdb::ColumnFamilyOptions()));*/
-  std::vector<rocksdb::ColumnFamilyHandle*> handles;
-  rocksdb::Status s = rocksdb::DB::Open(rocksdb::DBOptions(), path_, column_families, &handles, &db);
-  assert(s.ok());
 
-  std::vector<std::string> families;
-  db_->ListColumnFamilies(options,path_, &families);
-  for (auto& family : families){
-    std::cout<<family<<std::endl;
-
+  for (auto& family : families_) {
+    column_families.push_back(rocksdb::ColumnFamilyDescriptor(
+        family, rocksdb::ColumnFamilyOptions()));
   }
-}
-void rocksdbWrapper::loadNewDB() {
-  rocksdb::Options options;
-  options.create_if_missing = true;
-  options.error_if_exists = true;
-  rocksdb::Status status = rocksdb::DB::Open(options, path_, &db_);
-  if (!status.ok()) std::cerr << status.ToString() << std::endl;
-  std::string value;
 
-  rocksdb::ColumnFamilyHandle* cf;
-  status = db_->CreateColumnFamily(rocksdb::ColumnFamilyOptions(), "family_1", &cf);
-  assert(status.ok());
-  db_->DestroyColumnFamilyHandle(cf);
+  std::vector<rocksdb::ColumnFamilyHandle*> handles;
+  rocksdb::Status status = rocksdb::DB::Open(rocksdb::DBOptions(), path_,
+                                             column_families, &handles, &db_);
 
-  rocksdb::ColumnFamilyHandle* cf1;
-  status = db_->CreateColumnFamily(rocksdb::ColumnFamilyOptions(), "family_2", &cf1);
   assert(status.ok());
-  db_->DestroyColumnFamilyHandle(cf1);
+  for (size_t i = 0; i < families_.size(); ++i) {
+    for (int k = 0; k < columnSize_; ++k) {
+      status = db_->Put(rocksdb::WriteOptions(), handles[i],
+                        rocksdb::Slice("key_" + std::to_string(k)),
+                        rocksdb::Slice("value_" + std::to_string(k)));
+      assert(status.ok());
+    }
+  }
+  for (auto handle : handles) {
+    status = db_->DestroyColumnFamilyHandle(handle);
+    assert(status.ok());
+  }
 
   delete db_;
-  /*std::vector<std::string> families;
-  db_->ListColumnFamilies(options,"/home/rinat/labs/databasa", &families);
-  for (auto& family : families){
-    std::cout<<family<<std::endl;
-
-  }*/
-
-  /*for (int i = 0; i < dbSize_; ++i) {
-    status = db_->Put(rocksdb::WriteOptions(), "key" + std::to_string(i),
-                     std::to_string(i));
-    assert(status.ok());
-    status = db_->Get(rocksdb::ReadOptions(), "key" + std::to_string(i), &value);
-    assert(value == std::to_string(i));
-  }
-  */
 }
 
-void rocksdbWrapper::migrateDataToMap(std::map<std::string,std::string>& kvStorage){
+// migrate all family to array of map
+
+void rocksdbWrapper::migrateDataToMap(
+    std::map<std::string, std::map<std::string, std::string>>& kvfStorage) {
+  rocksdb::Options options;
+  // have to open default column family
+
+  std::vector<rocksdb::ColumnFamilyDescriptor> column_families;
+  column_families.push_back(rocksdb::ColumnFamilyDescriptor(
+      rocksdb::kDefaultColumnFamilyName, rocksdb::ColumnFamilyOptions()));
+  std::vector<rocksdb::ColumnFamilyHandle*> handles;
+  rocksdb::Status status = rocksdb::DB::OpenForReadOnly(rocksdb::DBOptions(), path_,
+                                                        column_families, &handles, &db_);
+
   rocksdb::Iterator* it = db_->NewIterator(rocksdb::ReadOptions());
-  for (it->SeekToFirst(); it->Valid(); it->Next()) {
+  std::map<std::string, std::string> kvStorage;
+  for(it->SeekToFirst(); it->Valid(); it->Next()){
     kvStorage[it->key().ToString()] = it->value().ToString();
   }
-  assert(it->status().ok());  // check for any errors found during the scan
+  kvfStorage["default"] = kvStorage;
+  kvStorage.clear();
+  assert(it->status().ok());// Check for any errors found during the scan
+
+  for (auto handle : handles) {
+    status = db_->DestroyColumnFamilyHandle(handle);
+    assert(status.ok());
+  }
+
+  handles.clear();
+  delete it;
+  delete db_;
+
+  for (const auto& family : families_) {
+    column_families.push_back(rocksdb::ColumnFamilyDescriptor(
+        family, rocksdb::ColumnFamilyOptions()));
+
+    status = rocksdb::DB::OpenForReadOnly(rocksdb::DBOptions(), path_,
+                                                          column_families, &handles, &db_);
+    assert(status.ok());
+
+    it = db_->NewIterator(rocksdb::ReadOptions());
+    for(it->SeekToFirst(); it->Valid(); it->Next()){
+      kvStorage[it->key().ToString()] = it->value().ToString();
+    }
+    kvfStorage[family] = kvStorage;
+    kvStorage.clear();
+    assert(it->status().ok());// Check for any errors found during the scan
+
+    for (auto handle : handles) {
+      status = db_->DestroyColumnFamilyHandle(handle);
+      assert(status.ok());
+    }
+
+  }
+  delete it;
+  delete db_;
+
 }
