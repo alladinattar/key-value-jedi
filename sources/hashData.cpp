@@ -19,7 +19,7 @@ void rocksMapHasher::hashStorage(std::string familyName,
     picosha2::hash256_hex_string(kv.first + kv.second, hash_hex_str);
     hashed[kv.first] = hash_hex_str;
 
-    BOOST_LOG_TRIVIAL(logLevel.) << "Family "<<familyName<<"->" <<kv.first<<"  hashed";
+    BOOST_LOG_TRIVIAL(logLevel) << "Family "<<familyName<<"->" <<kv.first<<"  hashed";
   }
   hashedMap_[familyName] = hashed;
   hashed.clear();

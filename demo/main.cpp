@@ -36,6 +36,8 @@ int main(int argc, char* argv[]) {
 
   std::string outPath;
   int threadNum;
+  boost::log::trivial::severity_level logLevel;
+
   if (vm["output"].empty()){
     outPath = "/tmp/outPut";
   }else{
@@ -46,6 +48,15 @@ int main(int argc, char* argv[]) {
   }else{
     threadNum = vm["thread-count"].as<int>();
   };
+
+  if (vm["log-level"].empty()){
+    logLevel = boost::log::trivial::severity_level::error;
+  }else if(vm["log-level"].as<std::string>() == "warning"){
+    logLevel = boost::log::trivial::severity_level::warning;
+  }else if (vm["log-level"].as<std::string>() == "info"){
+    logLevel = boost::log::trivial::severity_level::info;
+  }else throw "invalid log level";
+
   rocksMapHasher hasher = rocksMapHasher(threadNum);
   rocksdbWrapper db = rocksdbWrapper(10,10, "/tmp/database", hasher);
   //db.createDatabase();
@@ -56,7 +67,7 @@ int main(int argc, char* argv[]) {
   for (auto k:fams){
     std::cout<<k<<std::endl;
   }*/
-  db.migrateDataToMap();
+  db.migrateDataToMap(logLevel);
 
   rocksdbWrapper outputDB = rocksdbWrapper(hasher.getHashedMap(), outPath, hasher );
   outputDB.createOutputDatabase();

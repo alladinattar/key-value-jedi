@@ -22,6 +22,6 @@ class rocksMapHasher{
   void startHashing(std::string fimilyName, std::map<std::string,std::string> kvStorage, std::string logLevel);
  explicit rocksMapHasher( int threadNum)
       :  familyPool_(threadNum) {}
-  void hashStorage(std::string familyName, std::map<std::string, std::string> kvStorage, std::string logLevel);
+  void hashStorage(std::string familyName, std::map<std::string, std::string> kvStorage, boost: logLevel);
 };
 #endif  // INCLUDE_HTMLDOWNLOADER_HPP_

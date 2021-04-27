@@ -67,7 +67,7 @@ void rocksdbWrapper::pushData() {
 
 // migrate all family to array of map
 
-void rocksdbWrapper::migrateDataToMap(std::string logLevel) {
+void rocksdbWrapper::migrateDataToMap(boost::log::trivial::severity_level logLevel) {
   rocksdb::Options options;
   // have to open default column family
 
