@@ -40,13 +40,13 @@ int main(/*int argc, char* argv[]*/) {
   std::map<std::string, std::map<std::string, std::string>> mapa;
   db.migrateDataToMap();
 
-  for (auto const& x : hasher.getHashedMap()) {
+  /*for (auto const& x : hasher.getHashedMap()) {
     std::cout << x.first << std::endl;
     for (auto const& y : x.second) {
       std::cout<<"  " << y.first << ": " << y.second<<std::endl;
     }
     std::cout<<std::endl;
-  }
+  }*/
   /*if (vm.count("help")) {
     std::cout << desc << "\n";
     return 1;

@@ -17,9 +17,7 @@ include("cmake/HunterGate.cmake")
 
 HunterGate(
   URL "https://github.com/cpp-pm/hunter/archive/v0.23.278.tar.gz"
-  SHA1 "35fa55bc1dfcf9f4d7264f8bb26cd1759ce1ae07"
-  FILEPATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.cmake
-)
+  SHA1 "35fa55bc1dfcf9f4d7264f8bb26cd1759ce1ae07" FILEPATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.cmake )
 
 # TODO: rename project and delete this comment
 project(template VERSION 0.1.0)
@@ -33,9 +31,8 @@ find_package(gflags CONFIG REQUIRED)
 hunter_add_package(rocksdb)
 find_package(RocksDB CONFIG REQUIRED)
 
-hunter_add_package(Boost COMPONENTS program_options log thread system filesystem program_options)
-find_package(Boost CONFIG REQUIRED program_options log_setup log  thread system filesystem program_options)
-
+hunter_add_package(Boost COMPONENTS program_options log thread system filesystem )
+find_package(Boost CONFIG REQUIRED program_options log  thread system filesystem )
 hunter_add_package(GTest)
 find_package(GTest CONFIG REQUIRED)
 
@@ -61,7 +58,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(demo ${PROJECT_NAME} )
 target_link_libraries( ${PROJECT_NAME} RocksDB::rocksdb
         ${Boost_PROGRAM_OPTIONS_LIBRARY}
-
+Boost::log
         ${Boost_THREAD_LIBRARY}
         ${Boost_LOG_LIBRARY}
         ${Boost_FILESYSTEM_LIBRARY}
