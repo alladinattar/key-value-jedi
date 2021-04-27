@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
 
   std::string outPath;
   int threadNum;
-  boost::log::trivial::severity_level logLevel;
+  //boost::log::trivial::severity_level logLevel;
 
   if (vm["output"].empty()){
     outPath = "/tmp/outPut";
@@ -59,15 +59,15 @@ int main(int argc, char* argv[]) {
 
   rocksMapHasher hasher = rocksMapHasher(threadNum);
   rocksdbWrapper db = rocksdbWrapper(10,10, "/tmp/database", hasher);
-  //db.createDatabase();
+  db.createDatabase();
   db.getFamiliesFromBD();
-  //db.pushData();
+  db.pushData();
   std::map<std::string, std::map<std::string, std::string>> mapa;
   /*std::vector<std::string> fams = db.getFamilyNum();
   for (auto k:fams){
     std::cout<<k<<std::endl;
   }*/
-  db.migrateDataToMap(logLevel);
+  db.migrateDataToMap();
 
   rocksdbWrapper outputDB = rocksdbWrapper(hasher.getHashedMap(), outPath, hasher );
   outputDB.createOutputDatabase();

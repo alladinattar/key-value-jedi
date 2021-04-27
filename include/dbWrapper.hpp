@@ -37,7 +37,7 @@ class rocksdbWrapper {
   void createDatabase(std::map<std::string, std::map<std::string,std::string>> mapa);
   void getFamiliesFromBD();
   void pushData();
-  void migrateDataToMap(boost::log::trivial::severity_level logLevel);
+  void migrateDataToMap(/*boost::log::trivial::severity_level logLevel*/);
   ~rocksdbWrapper() { delete db_;}
 };
 
