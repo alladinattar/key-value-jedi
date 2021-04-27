@@ -40,6 +40,9 @@ int main(/*int argc, char* argv[]*/) {
   std::map<std::string, std::map<std::string, std::string>> mapa;
   db.migrateDataToMap();
 
+  rocksdbWrapper outputDB = rocksdbWrapper(hasher.getHashedMap(), "/tmp/outputDB", hasher );
+  outputDB.createOutputDatabase();
+
   /*for (auto const& x : hasher.getHashedMap()) {
     std::cout << x.first << std::endl;
     for (auto const& y : x.second) {

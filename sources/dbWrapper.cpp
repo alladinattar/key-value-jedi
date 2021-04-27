@@ -120,3 +120,54 @@ void rocksdbWrapper::migrateDataToMap() {
   delete it;
   delete db_;
 }
+
+void rocksdbWrapper::createOutputDatabase() {
+  rocksdb::Options options;
+  options.create_if_missing = true;
+
+  rocksdb::Status status = rocksdb::DB::Open(options, path_, &db_);
+  if (!status.ok()) std::cerr << status.ToString() << std::endl;
+
+  for (auto const& x : mapa_) {
+    if (x.first ==  "default"){
+      continue;
+    }
+    rocksdb::ColumnFamilyHandle* cf;
+    status =
+        db_->CreateColumnFamily(rocksdb::ColumnFamilyOptions(), x.first, &cf);
+    assert(status.ok());
+    db_->DestroyColumnFamilyHandle(cf);
+  }
+
+  delete db_;
+
+  std::vector<rocksdb::ColumnFamilyDescriptor> column_families;
+  // have to open default column family
+  column_families.push_back(rocksdb::ColumnFamilyDescriptor(
+      rocksdb::kDefaultColumnFamilyName, rocksdb::ColumnFamilyOptions()));
+
+  for (auto& family : mapa_) {
+    column_families.push_back(rocksdb::ColumnFamilyDescriptor(
+        family.first, rocksdb::ColumnFamilyOptions()));
+  }
+
+  std::vector<rocksdb::ColumnFamilyHandle*> handles;
+  status = rocksdb::DB::Open(rocksdb::DBOptions(), path_, column_families,
+                             &handles, &db_);
+
+  assert(status.ok());
+  for (size_t i = 0;i<mapa_.size();++i) {
+    for (auto& kv : mapa_[handles[i]->GetName()]){
+      status = db_->Put(rocksdb::WriteOptions(), handles[i],
+                        rocksdb::Slice(kv.first),
+                        rocksdb::Slice(kv.second));
+      assert(status.ok());
+    }
+  }
+
+  for (auto handle : handles) {
+    status = db_->DestroyColumnFamilyHandle(handle);
+    assert(status.ok());
+  }
+  delete db_;
+}
