@@ -3,6 +3,16 @@
 
 #include "hashData.hpp"
 #include "iostream"
+
+#include <boost/log/core.hpp>
+#include <boost/log/common.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/exceptions.hpp>
+#include <boost/log/utility/setup/file.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/sources/record_ostream.hpp>
+#include <boost/log/utility/setup/console.hpp>
 namespace po = boost::program_options;
 
 int main(/*int argc, char* argv[]*/) {
@@ -22,17 +32,15 @@ int main(/*int argc, char* argv[]*/) {
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);*/
-
-  rocksdbWrapper db = rocksdbWrapper(10,10, "/tmp/database");
+  rocksMapHasher hasher = rocksMapHasher(2);
+  rocksdbWrapper db = rocksdbWrapper(10,10, "/tmp/database", hasher);
   //db.createDatabase();
   db.getFamiliesFromBD();
   //db.pushData();
   std::map<std::string, std::map<std::string, std::string>> mapa;
-  db.migrateDataToMap(mapa);
-  rocksMapHasher hasher = rocksMapHasher(mapa);
-  std::map<std::string, std::map<std::string, std::string>> hashedMap = hasher.hashStorage();
+  db.migrateDataToMap();
 
-  for (auto const& x : hashedMap) {
+  for (auto const& x : hasher.getHashedMap()) {
     std::cout << x.first << std::endl;
     for (auto const& y : x.second) {
       std::cout<<"  " << y.first << ": " << y.second<<std::endl;
