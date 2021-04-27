@@ -24,12 +24,12 @@ class rocksdbWrapper {
       : columnSize_(columns), familyNum_(family), path_(std::move(path)), hasherObj_(hasher) {}
   rocksdbWrapper(std::map<std::string, std::map<std::string,std::string>> mapa, std::string path, rocksMapHasher& hasher): columnSize_(0), familyNum_(mapa.size()), path_(path), hasherObj_(hasher),mapa_(mapa){};
   void createOutputDatabase();
-  int getFamilyNum();
+  std::vector<std::string> getFamilyNum();
   void createDatabase();
   void createDatabase(std::map<std::string, std::map<std::string,std::string>> mapa);
   void getFamiliesFromBD();
   void pushData();
-  void migrateDataToMap();
+  void migrateDataToMap(std::string logLevel);
   ~rocksdbWrapper() { delete db_;}
 };
 

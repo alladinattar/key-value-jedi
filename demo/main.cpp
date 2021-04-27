@@ -15,8 +15,8 @@
 #include <boost/log/utility/setup/console.hpp>
 namespace po = boost::program_options;
 
-int main(/*int argc, char* argv[]*/) {
-  /*po::options_description desc(
+int main(int argc, char* argv[]) {
+  po::options_description desc(
       "Usage:\n  dbcs [options] <path/to/input/storage.db>\nMust have options");
   desc.add_options()("help", "produce help message")(
       "log-level", po::value<std::string>(),
@@ -31,27 +31,45 @@ int main(/*int argc, char* argv[]*/) {
 
   po::variables_map vm;
   po::store(po::parse_command_line(argc, argv, desc), vm);
-  po::notify(vm);*/
-  rocksMapHasher hasher = rocksMapHasher(2);
+  po::notify(vm);
+
+
+  std::string outPath;
+  int threadNum;
+  if (vm["output"].empty()){
+    outPath = "/tmp/outPut";
+  }else{
+    outPath = vm["output"].as<std::string>();
+  }
+  if(vm["thread-count"].empty()){
+    threadNum = std::thread::hardware_concurrency();
+  }else{
+    threadNum = vm["thread-count"].as<int>();
+  };
+  rocksMapHasher hasher = rocksMapHasher(threadNum);
   rocksdbWrapper db = rocksdbWrapper(10,10, "/tmp/database", hasher);
   //db.createDatabase();
   db.getFamiliesFromBD();
   //db.pushData();
   std::map<std::string, std::map<std::string, std::string>> mapa;
+  /*std::vector<std::string> fams = db.getFamilyNum();
+  for (auto k:fams){
+    std::cout<<k<<std::endl;
+  }*/
   db.migrateDataToMap();
 
-  rocksdbWrapper outputDB = rocksdbWrapper(hasher.getHashedMap(), "/tmp/outputDB", hasher );
+  rocksdbWrapper outputDB = rocksdbWrapper(hasher.getHashedMap(), outPath, hasher );
   outputDB.createOutputDatabase();
 
-  /*for (auto const& x : hasher.getHashedMap()) {
+  for (auto const& x : hasher.getHashedMap()) {
     std::cout << x.first << std::endl;
     for (auto const& y : x.second) {
       std::cout<<"  " << y.first << ": " << y.second<<std::endl;
     }
     std::cout<<std::endl;
-  }*/
-  /*if (vm.count("help")) {
+  }
+  if (vm.count("help")) {
     std::cout << desc << "\n";
     return 1;
-  }*/
+  }
 }

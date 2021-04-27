@@ -29,7 +29,7 @@ void rocksdbWrapper::createDatabase() {
   delete db_;
 }
 
-int rocksdbWrapper::getFamilyNum() { return families_.size(); }
+std::vector<std::string> rocksdbWrapper::getFamilyNum() { return families_ ;}
 
 void rocksdbWrapper::pushData() {
   rocksdb::Options options;
@@ -67,7 +67,7 @@ void rocksdbWrapper::pushData() {
 
 // migrate all family to array of map
 
-void rocksdbWrapper::migrateDataToMap() {
+void rocksdbWrapper::migrateDataToMap(std::string logLevel) {
   rocksdb::Options options;
   // have to open default column family
 
@@ -83,7 +83,7 @@ void rocksdbWrapper::migrateDataToMap() {
   for (it->SeekToFirst(); it->Valid(); it->Next()) {
     kvStorage[it->key().ToString()] = it->value().ToString();
   }
-  hasherObj_.startHashing("default", kvStorage);
+  //hasherObj_.startHashing("default", kvStorage);
   kvStorage.clear();
   assert(it->status().ok());  // Check for any errors found during the scan
 
@@ -109,6 +109,7 @@ void rocksdbWrapper::migrateDataToMap() {
       kvStorage[it->key().ToString()] = it->value().ToString();
     }
     hasherObj_.startHashing(family, kvStorage);
+
     kvStorage.clear();
     assert(it->status().ok());  // Check for any errors found during the scan
 
