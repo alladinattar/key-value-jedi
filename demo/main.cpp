@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
   }else{
     threadNum = vm["thread-count"].as<int>();
   };
-  srand((int)time(0));
+  srand((int)time(nullptr));
 
 
 
@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
   std::map<std::string, std::map<std::string, std::string>> mapa;
   std::vector<std::string> fams = db.getFamilyNum();
 
-  db.migrateDataToMap();
+  db.migrateDataToMap(logLevel);
 
   rocksdbWrapper outputDB = rocksdbWrapper(hasher.getHashedMap(), outPath, hasher );
   outputDB.createOutputDatabase();

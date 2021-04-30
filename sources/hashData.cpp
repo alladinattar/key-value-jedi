@@ -22,7 +22,7 @@ boost::log :: trivial::severity_level whatIsLevel(std::string logLevel) {
     return boost::log::trivial::severity_level::info;
   } else
     throw "invalid log level";
-};
+}
 void rocksMapHasher::hashStorage(std::string familyName,
                                  std::map<std::string, std::string> kvStorage,
                                  std::string logLevel) {
@@ -34,7 +34,9 @@ void rocksMapHasher::hashStorage(std::string familyName,
 
     boost::log::core::get()->set_filter(boost::log::trivial::severity >=
                                         whatIsLevel(logLevel));
+
      BOOST_LOG_TRIVIAL() << "Family "<<familyName<<"->"
+
      <<kv.first<<"  hashed";
   }
   mutex.lock();

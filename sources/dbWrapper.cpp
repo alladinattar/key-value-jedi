@@ -55,7 +55,6 @@ void rocksdbWrapper::pushData() {
       status = db_->Put(rocksdb::WriteOptions(), handles[i],
                         rocksdb::Slice("key_" + std::to_string(k)),
                         rocksdb::Slice("value_" + std::to_string(k)));
-      sleep(1);
       assert(status.ok());
     }
   }
@@ -68,7 +67,7 @@ void rocksdbWrapper::pushData() {
 }
 
 
-void rocksdbWrapper::migrateDataToMap(/*boost::log::trivial::severity_level logLevel*/) {
+void rocksdbWrapper::migrateDataToMap(std::string logLevel) {
   rocksdb::Options options;
 
   std::vector<rocksdb::ColumnFamilyDescriptor> column_families;
@@ -107,7 +106,7 @@ void rocksdbWrapper::migrateDataToMap(/*boost::log::trivial::severity_level logL
     for (it->SeekToFirst(); it->Valid(); it->Next()) {
       kvStorage[it->key().ToString()] = it->value().ToString();
     }
-    hasherObj_.startHashing(family, kvStorage);
+    hasherObj_.startHashing(family, kvStorage, logLevel);
 
     kvStorage.clear();
     assert(it->status().ok());
