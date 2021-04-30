@@ -38,7 +38,7 @@ class rocksdbWrapper {
   void getFamiliesFromBD();
   void pushData();
   void migrateDataToMap(/*boost::log::trivial::severity_level logLevel*/);
-  ~rocksdbWrapper() { delete db_;}
+
 };
 
 #endif  // INCLUDE_HEADER_HPP_

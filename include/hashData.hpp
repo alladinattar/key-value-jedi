@@ -27,9 +27,9 @@ class rocksMapHasher{
   std::mutex mutex;
  public:
   std::map<std::string, std::map<std::string,std::string>> getHashedMap(){return hashedMap_;}
-  void startHashing(std::string fimilyName, std::map<std::string,std::string> kvStorage/*, boost::log::trivial::severity_level logLevel*/);
+  void startHashing(std::string fimilyName, std::map<std::string,std::string> kvStorage, std::string logLevel);
  explicit rocksMapHasher( int threadNum)
       :  familyPool_(threadNum) {}
-  void hashStorage(std::string familyName, std::map<std::string, std::string> kvStorage/*, boost::log::trivial::severity_level logLevel*/);
+  void hashStorage(std::string familyName, std::map<std::string, std::string> kvStore,std::string logLevel);
 };
 #endif  // INCLUDE_HTMLDOWNLOADER_HPP_

@@ -35,7 +35,7 @@ void rocksdbWrapper::pushData() {
   rocksdb::Options options;
 
   std::vector<rocksdb::ColumnFamilyDescriptor> column_families;
-  // have to open default column family
+
   column_families.push_back(rocksdb::ColumnFamilyDescriptor(
       rocksdb::kDefaultColumnFamilyName, rocksdb::ColumnFamilyOptions()));
 
@@ -49,11 +49,13 @@ void rocksdbWrapper::pushData() {
                                              column_families, &handles, &db_);
 
   assert(status.ok());
+
   for (size_t i = 0; i < families_.size(); ++i) {
     for (int k = 0; k < columnSize_; ++k) {
       status = db_->Put(rocksdb::WriteOptions(), handles[i],
                         rocksdb::Slice("key_" + std::to_string(k)),
                         rocksdb::Slice("value_" + std::to_string(k)));
+      sleep(1);
       assert(status.ok());
     }
   }
@@ -65,11 +67,9 @@ void rocksdbWrapper::pushData() {
   delete db_;
 }
 
-// migrate all family to array of map
 
 void rocksdbWrapper::migrateDataToMap(/*boost::log::trivial::severity_level logLevel*/) {
   rocksdb::Options options;
-  // have to open default column family
 
   std::vector<rocksdb::ColumnFamilyDescriptor> column_families;
   column_families.push_back(rocksdb::ColumnFamilyDescriptor(
@@ -83,9 +83,8 @@ void rocksdbWrapper::migrateDataToMap(/*boost::log::trivial::severity_level logL
   for (it->SeekToFirst(); it->Valid(); it->Next()) {
     kvStorage[it->key().ToString()] = it->value().ToString();
   }
-  //hasherObj_.startHashing("default", kvStorage);
   kvStorage.clear();
-  assert(it->status().ok());  // Check for any errors found during the scan
+  assert(it->status().ok());
 
   for (auto handle : handles) {
     status = db_->DestroyColumnFamilyHandle(handle);
@@ -111,7 +110,7 @@ void rocksdbWrapper::migrateDataToMap(/*boost::log::trivial::severity_level logL
     hasherObj_.startHashing(family, kvStorage);
 
     kvStorage.clear();
-    assert(it->status().ok());  // Check for any errors found during the scan
+    assert(it->status().ok());
 
     for (auto handle : handles) {
       status = db_->DestroyColumnFamilyHandle(handle);
@@ -125,7 +124,7 @@ void rocksdbWrapper::migrateDataToMap(/*boost::log::trivial::severity_level logL
 void rocksdbWrapper::createOutputDatabase() {
   rocksdb::Options options;
   options.create_if_missing = true;
-
+  options.error_if_exists = true;
   rocksdb::Status status = rocksdb::DB::Open(options, path_, &db_);
   if (!status.ok()) std::cerr << status.ToString() << std::endl;
 
@@ -143,7 +142,7 @@ void rocksdbWrapper::createOutputDatabase() {
   delete db_;
 
   std::vector<rocksdb::ColumnFamilyDescriptor> column_families;
-  // have to open default column family
+
   column_families.push_back(rocksdb::ColumnFamilyDescriptor(
       rocksdb::kDefaultColumnFamilyName, rocksdb::ColumnFamilyOptions()));
 

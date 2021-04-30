@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
       "log-level", po::value<std::string>(),
       "info|warning|error \ndefault: error")("thread-count", po::value<int>(),
                                              "default: count of logical "
-                                             "core")("output ",
+                                             "core")("output",
                                                      po::value<std::string>(),
                                                      "<path/to/output/"
                                                      "storage.db>\ndefault:"
@@ -33,11 +33,14 @@ int main(int argc, char* argv[]) {
   po::store(po::parse_command_line(argc, argv, desc), vm);
   po::notify(vm);
 
+  if (vm.count("help")) {
+    std::cout << desc << "\n";
+    return 1;
+  }
 
   std::string outPath;
   int threadNum;
-  //boost::log::trivial::severity_level logLevel;
-
+  std::string logLevel = vm["log-level"].as<std::string>();
   if (vm["output"].empty()){
     outPath = "/tmp/outPut";
   }else{
@@ -48,14 +51,9 @@ int main(int argc, char* argv[]) {
   }else{
     threadNum = vm["thread-count"].as<int>();
   };
+  srand((int)time(0));
 
-  if (vm["log-level"].empty()){
-    logLevel = boost::log::trivial::severity_level::error;
-  }else if(vm["log-level"].as<std::string>() == "warning"){
-    logLevel = boost::log::trivial::severity_level::warning;
-  }else if (vm["log-level"].as<std::string>() == "info"){
-    logLevel = boost::log::trivial::severity_level::info;
-  }else throw "invalid log level";
+
 
   rocksMapHasher hasher = rocksMapHasher(threadNum);
   rocksdbWrapper db = rocksdbWrapper(10,10, "/tmp/database", hasher);
@@ -63,10 +61,8 @@ int main(int argc, char* argv[]) {
   db.getFamiliesFromBD();
   db.pushData();
   std::map<std::string, std::map<std::string, std::string>> mapa;
-  /*std::vector<std::string> fams = db.getFamilyNum();
-  for (auto k:fams){
-    std::cout<<k<<std::endl;
-  }*/
+  std::vector<std::string> fams = db.getFamilyNum();
+
   db.migrateDataToMap();
 
   rocksdbWrapper outputDB = rocksdbWrapper(hasher.getHashedMap(), outPath, hasher );
@@ -79,8 +75,5 @@ int main(int argc, char* argv[]) {
     }
     std::cout<<std::endl;
   }
-  if (vm.count("help")) {
-    std::cout << desc << "\n";
-    return 1;
-  }
+
 }
