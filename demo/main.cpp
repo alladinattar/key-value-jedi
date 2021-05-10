@@ -1,18 +1,17 @@
+#include <boost/log/common.hpp>
+#include <boost/log/core.hpp>
+#include <boost/log/exceptions.hpp>
+#include <boost/log/sources/record_ostream.hpp>
+#include <boost/log/sources/severity_logger.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/utility/setup/common_attributes.hpp>
+#include <boost/log/utility/setup/console.hpp>
+#include <boost/log/utility/setup/file.hpp>
 #include <boost/program_options.hpp>
 #include <dbWrapper.hpp>
 
 #include "hashData.hpp"
 #include "iostream"
-
-#include <boost/log/core.hpp>
-#include <boost/log/common.hpp>
-#include <boost/log/trivial.hpp>
-#include <boost/log/exceptions.hpp>
-#include <boost/log/utility/setup/file.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
-#include <boost/log/sources/severity_logger.hpp>
-#include <boost/log/sources/record_ostream.hpp>
-#include <boost/log/utility/setup/console.hpp>
 namespace po = boost::program_options;
 
 int main(int argc, char* argv[]) {
@@ -41,22 +40,20 @@ int main(int argc, char* argv[]) {
   std::string outPath;
   int threadNum;
   std::string logLevel = vm["log-level"].as<std::string>();
-  if (vm["output"].empty()){
+  if (vm["output"].empty()) {
     outPath = "/tmp/outPut";
-  }else{
+  } else {
     outPath = vm["output"].as<std::string>();
   }
-  if(vm["thread-count"].empty()){
+  if (vm["thread-count"].empty()) {
     threadNum = std::thread::hardware_concurrency();
-  }else{
+  } else {
     threadNum = vm["thread-count"].as<int>();
   };
   srand((int)time(nullptr));
 
-
-
   rocksMapHasher hasher = rocksMapHasher(threadNum);
-  rocksdbWrapper db = rocksdbWrapper(10,10, "/tmp/database", hasher);
+  rocksdbWrapper db = rocksdbWrapper(10, 10, "/tmp/database", hasher);
   db.createDatabase();
   db.getFamiliesFromBD();
   db.pushData();
@@ -65,15 +62,15 @@ int main(int argc, char* argv[]) {
 
   db.migrateDataToMap(logLevel);
 
-  rocksdbWrapper outputDB = rocksdbWrapper(hasher.getHashedMap(), outPath, hasher );
+  rocksdbWrapper outputDB =
+      rocksdbWrapper(hasher.getHashedMap(), outPath, hasher);
   outputDB.createOutputDatabase();
 
   for (auto const& x : hasher.getHashedMap()) {
     std::cout << x.first << std::endl;
     for (auto const& y : x.second) {
-      std::cout<<"  " << y.first << ": " << y.second<<std::endl;
+      std::cout << "  " << y.first << ": " << y.second << std::endl;
     }
-    std::cout<<std::endl;
+    std::cout << std::endl;
   }
-
 }

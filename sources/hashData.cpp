@@ -13,10 +13,10 @@
 #include "iostream"
 #include "picosha2.h"
 
-boost::log :: trivial::severity_level whatIsLevel(std::string logLevel) {
-  if(logLevel.empty()){
+boost::log ::trivial::severity_level whatIsLevel(std::string logLevel) {
+  if (logLevel.empty()) {
     return boost::log::trivial::severity_level::error;
-  }else if (logLevel == "warning") {
+  } else if (logLevel == "warning") {
     return boost::log::trivial::severity_level::warning;
   } else if (logLevel == "info") {
     return boost::log::trivial::severity_level::info;
@@ -35,9 +35,9 @@ void rocksMapHasher::hashStorage(std::string familyName,
     boost::log::core::get()->set_filter(boost::log::trivial::severity >=
                                         whatIsLevel(logLevel));
 
-     BOOST_LOG_TRIVIAL() << "Family "<<familyName<<"->"
+    BOOST_LOG_TRIVIAL(info) << "Family " << familyName << "->"
 
-     <<kv.first<<"  hashed";
+                            << kv.first << "  hashed";
   }
   mutex.lock();
   hashedMap_[familyName] = hashed;
