@@ -155,7 +155,7 @@ void rocksdbWrapper::createOutputDatabase() {
                              &handles, &db_);
 
   assert(status.ok());
-  for (size_t i = 0;i<mapa_.size();++i) {
+  for (size_t i = 0; i < mapa_.size(); ++i) {
     for (auto& kv : mapa_[handles[i]->GetName()]){
       status = db_->Put(rocksdb::WriteOptions(), handles[i],
                         rocksdb::Slice(kv.first),

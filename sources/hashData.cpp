@@ -1,3 +1,5 @@
+// Copyright 2021 Rinat Mukaev <rinamuka4@gmail.com>
+
 #include "hashData.hpp"
 
 #include <boost/log/common.hpp>
@@ -11,7 +13,7 @@
 #include <boost/log/utility/setup/file.hpp>
 
 #include "iostream"
-#include "picosha2.h"
+#include <picosha2.h>
 
 boost::log ::trivial::severity_level whatIsLevel(std::string logLevel) {
   if (logLevel.empty()) {

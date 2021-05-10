@@ -1,5 +1,6 @@
-#ifndef INCLUDE_HTMLDOWNLOADER_HPP_
-#define INCLUDE_HTMLDOWNLOADER_HPP_
+// Copyright 2021 Rinat Mukaev <rinamuka4@gmail.com>
+#ifndef INCLUDE_HASHDATA_HPP_  
+#define INCLUDE_HASHDATA_HPP_  
 #include <boost/log/common.hpp>
 #include <boost/log/core.hpp>
 #include <boost/log/exceptions.hpp>
@@ -10,12 +11,11 @@
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
 #include <map>
-
+#include <string>
 #include "ThreadPool.h"
 #include "iostream"
-#include "map"
 #include "mutex"
-#include "picosha2.h"
+#include <picosha2.h>
 #include "utility"
 class rocksMapHasher {
  private:
@@ -36,4 +36,4 @@ class rocksMapHasher {
                    std::map<std::string, std::string> kvStore,
                    std::string logLevel);
 };
-#endif  // INCLUDE_HTMLDOWNLOADER_HPP_
+#endif  // INCLUDE_HASHDATA_HPP_  
