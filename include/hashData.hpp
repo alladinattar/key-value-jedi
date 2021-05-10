@@ -1,6 +1,6 @@
 // Copyright 2021 Rinat Mukaev <rinamuka4@gmail.com>
-#ifndef INCLUDE_HASHDATA_HPP_  
-#define INCLUDE_HASHDATA_HPP_  
+#ifndef INCLUDE_HASHDATA_HPP_
+#define INCLUDE_HASHDATA_HPP_
 #include <boost/log/common.hpp>
 #include <boost/log/core.hpp>
 #include <boost/log/exceptions.hpp>
@@ -36,4 +36,4 @@ class rocksMapHasher {
                    std::map<std::string, std::string> kvStore,
                    std::string logLevel);
 };
-#endif  // INCLUDE_HASHDATA_HPP_  
+#endif  // INCLUDE_HASHDATA_HPP_

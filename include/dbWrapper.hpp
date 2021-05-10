@@ -1,6 +1,6 @@
 // Copyright 2021 Rinat Mukaev <rinamuka4@gmail.com>
-#ifndef INCLUDE_DBWRAPPER_HPP_  
-#define INCLUDE_DBWRAPPER_HPP_  
+#ifndef INCLUDE_DBWRAPPER_HPP_
+#define INCLUDE_DBWRAPPER_HPP_
 #include <assert.h>
 #include <boost/log/common.hpp>
 #include <boost/log/core.hpp>
