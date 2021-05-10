@@ -1,7 +1,7 @@
 // Copyright 2021 Rinat Mukaev <rinamuka4@gmail.com>
 
-#ifndef INCLUDE_HEADER_HPP_
-#define INCLUDE_HEADER_HPP_
+#ifndef INCLUDE_DBWRAPPER_HPP_  
+#define INCLUDE_DBWRAPPER_HPP_  
 #include <assert.h>
 
 #include <boost/log/common.hpp>
@@ -14,7 +14,9 @@
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
 #include <utility>
-
+#include <vector>
+#include <map>
+#include <string>
 #include "ThreadPool.h"
 #include "hashData.hpp"
 #include "iostream"
@@ -42,7 +44,7 @@ class rocksdbWrapper {
         familyNum_(mapa.size()),
         path_(path),
         hasherObj_(hasher),
-        mapa_(mapa){};
+        mapa_(mapa){}
   void createOutputDatabase();
   std::vector<std::string> getFamilyNum();
   void createDatabase();
@@ -53,4 +55,4 @@ class rocksdbWrapper {
   void migrateDataToMap(std::string logLevel);
 };
 
-#endif  // INCLUDE_HEADER_HPP_
+#endif  // INCLUDE_DBWRAPPER_HPP_     
