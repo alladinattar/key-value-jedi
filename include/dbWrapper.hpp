@@ -52,4 +52,4 @@ class rocksdbWrapper {
   void pushData();
   void migrateDataToMap(std::string logLevel);
 };
-#endif  // INCLUDE_DBWRAPPER_HPP_     
+#endif  // INCLUDE_DBWRAPPER_HPP_
